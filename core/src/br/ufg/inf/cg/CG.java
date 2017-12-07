@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
+import java.awt.Frame;
+
 import br.ufg.inf.cg.models.Objeto3D;
 
 public class CG extends ApplicationAdapter {
@@ -17,12 +19,14 @@ public class CG extends ApplicationAdapter {
     Texture img;
     Pixmap map;
     Objeto3D obj;
+    FrameRate fps;
 
 	@Override
 	public void create () {
         batch = new SpriteBatch();
         map = new Pixmap(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), Pixmap.Format.RGB888);
         obj = Objeto3D.create(Objeto3D.ObjType.CUBO);
+        fps = new FrameRate();
 	}
 
 	@Override
@@ -36,10 +40,10 @@ public class CG extends ApplicationAdapter {
 	    batch.begin();
         batch.draw(img, 0, 0);
         batch.end();
+        img.dispose();
 
-        try {
-            Thread.sleep((long)(1000/30-Gdx.graphics.getDeltaTime()));
-        } catch (InterruptedException e) { }
+        fps.update();
+        fps.render(50, 50);
     }
 	
 	@Override
@@ -47,5 +51,6 @@ public class CG extends ApplicationAdapter {
 	    batch.dispose();
 	    img.dispose();
 	    map.dispose();
+	    fps.dispose();
     }
 }

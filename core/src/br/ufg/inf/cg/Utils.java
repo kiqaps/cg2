@@ -12,6 +12,23 @@ import br.ufg.inf.cg.models.Ponto;
 
 public class Utils {
 
+    public static double[][] Multiplica(double[][] mat1, double[][] mat2)
+    {
+        double[][] ret = new double[mat1.length][mat2[0].length];
+
+        for(int i = 0; i < mat1.length; i++)
+        {
+            for (int j = 0; j < mat2[0].length; j++)
+            {
+                double soma = 0;
+                for (int k = 0; k < mat2.length; k++)
+                    soma += mat1[i][k] * mat2[k][j];
+                ret[i][j] = soma;
+            }
+        }
+        return ret;
+    }
+
     public static ArrayList<Ponto> Multiplica(ArrayList<Ponto> pontos, int[][] mat)
     {
         ArrayList<Ponto> ret = new ArrayList<Ponto>();

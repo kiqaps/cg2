@@ -15,7 +15,7 @@ import br.ufg.inf.cg.Utils;
 public class Objeto3D {
 
     public int Tx = 0, Ty = 0, Tz = 0;
-    public int Sx = 100, Sy = 100, Sz = 100;
+    public int Sx = 200, Sy = 200, Sz = 200;
     public int Rx = 0, Ry = 0, Rz = 0;
     public int Fz = 1000;
 
@@ -49,6 +49,9 @@ public class Objeto3D {
 
     public void draw(Pixmap map)
     {
+        map.setColor(new Color(0,0,0,1));
+        Utils.linhaDDA(map, new Ponto(Gdx.graphics.getWidth() / 2, 0, 0), new Ponto(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight(), 0));
+
         map.setColor(new Color(1,0,0,1));
 
         pontos.clear();
@@ -59,7 +62,9 @@ public class Objeto3D {
         aplicarRotacao();
         aplicarTranslocacao();
         aplicarProjecao();
-        
+
+        ArrayList<Ponto> esq = new ArrayList<Ponto>(), dir = new ArrayList<Ponto>();
+
         for (Ponto ponto : pontos)
         {
             ponto.x += Gdx.graphics.getWidth();
@@ -70,19 +75,46 @@ public class Objeto3D {
 
             ponto.x = (Gdx.graphics.getWidth() * (ponto.x / (2f * Gdx.graphics.getWidth())));
             ponto.y = (Gdx.graphics.getHeight() * (ponto.y / (2f * Gdx.graphics.getHeight())));
+
+            esq.add(new Ponto(ponto.x - Gdx.graphics.getWidth() / 4, ponto.y, 0));
+            dir.add(new Ponto(ponto.x + Gdx.graphics.getWidth() / 4, ponto.y, 0));
         }
 
         for (int[] linha : linhas)
-            Utils.linhaDDA(map, pontos.get(linha[0]), pontos.get(linha[1]));
+        {
+            Utils.linhaDDA(map, esq.get(linha[0]), esq.get(linha[1]));
+            Utils.linhaDDA(map, dir.get(linha[0]), dir.get(linha[1]));
+        }
     }
 
     private void aplicarProjecao() {
+        double Fx = Gdx.graphics.getWidth() * 1,
+                Fy = Gdx.graphics.getHeight() * -1;
+
+        double[][] mat1 = {
+            {1, 0, 0, 0},
+            {0, 1, 0, 0},
+            {0, 0, 1, 0},
+            {-Fx, -Fy, 0, 1}
+        };
+
+        double[][] mat2 = {
+            {1, 0, 0, 0},
+            {0, 1, 0, 0},
+            {0, 0, 1, 0},
+            {Fx, Fy, 0, 1}
+        };
+
         double[][] _1ptFuga = {
             {1, 0, 0, 0},
             {0, 1, 0, 0},
             {0, 0, 0, -1f / Fz},
             {0, 0 ,0, 1}
         };
+
+        _1ptFuga = Utils.Multiplica(mat1, _1ptFuga);
+        _1ptFuga = Utils.Multiplica(_1ptFuga, mat2);
+
         pontos = Utils.Multiplica(pontos, _1ptFuga);
     }
 
