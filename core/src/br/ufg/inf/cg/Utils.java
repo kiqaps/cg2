@@ -1,5 +1,6 @@
 package br.ufg.inf.cg;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap;
 
 import java.util.ArrayList;
@@ -89,6 +90,34 @@ public class Utils {
             x += incX;
             y += incY;
             map.drawPixel((int) Math.round(x), (int) Math.round(y));
+        }
+    }
+
+    public static void linhaDDA(Pixmap map, Ponto pi, Ponto pf, int quadrante)
+    {
+        int passos,
+                dx = (int) Math.round(pf.x - pi.x),
+                dy = (int) Math.round(pf.y - pi.y);
+
+        double incX, incY, x = pi.x, y = pi.y;
+
+        if (Math.abs(dx) > Math.abs(dy))
+            passos = Math.abs(dx);
+        else
+            passos = Math.abs(dy);
+
+        incX = dx / (double) passos;
+        incY = dy / (double) passos;
+
+        if ((quadrante == 0 && x < Gdx.graphics.getWidth() / 2) || (quadrante == 1 && x > Gdx.graphics.getWidth() / 2))
+            map.drawPixel((int) Math.round(x), (int) Math.round(y));
+        for (int i = 0; i < passos; i++)
+        {
+            x += incX;
+            y += incY;
+
+            if ((quadrante == 0 && x < Gdx.graphics.getWidth() / 2) || (quadrante == 1 && x > Gdx.graphics.getWidth() / 2))
+                map.drawPixel((int) Math.round(x), (int) Math.round(y));
         }
     }
 }
