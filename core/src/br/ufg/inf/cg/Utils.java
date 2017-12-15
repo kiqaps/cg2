@@ -7,10 +7,6 @@ import java.util.ArrayList;
 
 import br.ufg.inf.cg.models.Ponto;
 
-/**
- * Created by kiqaps on 06/12/17.
- */
-
 public class Utils {
 
     public static double[][] Multiplica(double[][] mat1, double[][] mat2)

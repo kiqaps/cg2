@@ -1,8 +1,6 @@
 package br.ufg.inf.cg.models;
 
-/**
- * Created by kiqaps on 06/12/17.
- */
+
 
 public class Ponto {
     public double x, y, z, m;

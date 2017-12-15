@@ -27,14 +27,13 @@ public class CG extends ApplicationAdapter {
 	public void create () {
         batch = new SpriteBatch();
         map = new Pixmap(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), Pixmap.Format.RGB888);
-        obj = Objeto3D.create(Objeto3D.ObjType.CUBO);
-        obj2 = Objeto3D.create(Objeto3D.ObjType.ESTRELA);
+        obj =  Objeto3D.create(Objeto3D.ObjType.CUBO);
+        obj2 = Objeto3D.create(Objeto3D.ObjType.CUBO);
 
         obj.Tx = -150;
         obj.Tz = -200;
         obj2.Tx = 150;
         obj2.Tz = 200;
-        //obj2.Rx = 90 *  Math.PI/180;
         fps = new FrameRate();
 	}
 

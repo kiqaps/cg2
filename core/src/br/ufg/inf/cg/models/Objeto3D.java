@@ -12,17 +12,13 @@ import java.util.Locale;
 
 import br.ufg.inf.cg.Utils;
 
-/**
- * Created by kiqaps on 06/12/17.
- */
-
 public class Objeto3D {
 
-    public int dist = 100;
-    public int Tx = 0, Ty = 0, Tz = 0;
-    public int Sx = 100, Sy = 100, Sz = 100;
+    public int dist = 50;
+    public double Tx = 0, Ty = 0, Tz = 0;
+    public double Sx = 100, Sy = 100, Sz = 100;
     public double Rx = 0, Ry = 0, Rz = 0;
-    public int Fz = 1000;
+    public double Fz = 1000 ;
     public double baseRRx, baseRRy, baseRRz, oldRRx, oldRRy, oldRRz;
 
     private ArrayList<Ponto> pontos = new ArrayList<Ponto>();
@@ -65,9 +61,9 @@ public class Objeto3D {
             pontos.add(new Ponto(p));
 
         aplicarEscala();
-        aplicarRotacao();
         aplicarTranslocacao();
 
+        aplicarRotacao();
         aplicarRotacaoUniversal();
 
         aplicarProjecao();
@@ -128,7 +124,7 @@ public class Objeto3D {
     }
 
     private void aplicarTranslocacao() {
-        int[][] translocation = {
+        double[][] translocation = {
             {1, 0, 0, 0},
             {0, 1, 0, 0},
             {0, 0, 1, 0},
@@ -145,49 +141,50 @@ public class Objeto3D {
         Matrix4 m = new Matrix4(mat);
         Quaternion q = m.getRotation(new Quaternion());
 
-        //Gdx.app.log("SANDBOX", String.format("Z=%f, Roll=%f, X=%f", q.getPitch(), q.getRoll(), q.getYaw()));
+        double gyroX = Gdx.input.getGyroscopeX();
+        double gyroY = Gdx.input.getGyroscopeY();
+        double gyroZ = Gdx.input.getGyroscopeZ();
+        double RRx = oldRRx, RRy = oldRRy,RRz = oldRRz;
 
-        double RRz = ((q.getPitch() - baseRRz) * Math.PI / 180f) * -1.1;
-        double RRy = (q.getYaw() - baseRRy) * Math.PI / 180f;
-        double RRx = (q.getRoll() - baseRRx) * Math.PI / 180f;
+        RRx += gyroX * 0.009;
+        RRy += gyroY * 0.02;
 
-        double deltaRRx = Math.abs(oldRRx - RRx);
-        double deltaRRy = Math.abs(oldRRy - RRy);
-        double deltaRRz = Math.abs(oldRRz - RRz);
+        if(Double.compare(Math.abs(gyroZ * 0.023), 0.5) < 0)
+            RRz += gyroZ * 0.03;
 
-        Gdx.app.log("DEBUG", String.format("RRx: %.2f, y: %.2f , z: %.2f", RRx, RRy, RRz));
 
-        if (deltaRRz <= 0.01)
-            RRz = oldRRz;
-        if (deltaRRy <= 0.01)
-            RRy = oldRRy;
-        if (deltaRRx <= 0.01)
-            RRx = oldRRx;
 
+        Gdx.app.log("tag", String.format("old = %.2f, RRz: %.2f , delta = %.2f",oldRRz ,RRz, Math.abs(oldRRz - RRz)));
 
         double[][] RotZ = {
-                {Math.cos(RRz), Math.sin(RRz), 0, 0},
-                {-Math.sin(RRz), Math.cos(RRz), 0, 0},
+                {Math.cos(-RRz), Math.sin(-RRz), 0, 0},
+                {-Math.sin(-RRz), Math.cos(-RRz), 0, 0},
                 {0, 0, 1, 0},
                 {0, 0, 0, 1}
         };
         oldRRz = RRz;
         pontos = Utils.Multiplica(pontos, RotZ);
 
-        //int TTx = (int) Math.round((Gdx.graphics.getWidth() * RRx) / 1.57);
-        int TTy = (int) Math.round((Gdx.graphics.getHeight() * RRy) / 1.57);
-        //TTx -= Gdx.graphics.getWidth();
-        TTy -= Gdx.graphics.getHeight();
-        int[][] matRRy = {
-            {1, 0, 0, 0},
-            {0, 1, 0, 0},
-            {0, 0, 1, 0},
-            {0, -TTy, 0, 1}
+        double TTx =  Math.round((Gdx.graphics.getWidth() * RRx) / (Math.PI/2) ) ;
+        double[][] matRRx = {
+                {1, 0, 0, 0},
+                {0, 1, 0, 0},
+                {0, 0, 1, 0},
+                {TTx, 0, 0, 1}
+        };
+        oldRRx = RRx;
+        pontos = Utils.Multiplica(pontos, matRRx);
+
+        double TTy =  Math.round((Gdx.graphics.getHeight() * RRy) / (Math.PI/2));
+        double[][] matRRy = {
+                {1, 0, 0, 0},
+                {0, 1, 0, 0},
+                {0, 0, 1, 0},
+                {0, TTy, 0, 1}
         };
         oldRRy = RRy;
-        oldRRx = RRx;
-
         pontos = Utils.Multiplica(pontos, matRRy);
+
     }
 
     private void aplicarRotacao()
@@ -215,10 +212,11 @@ public class Objeto3D {
                 {0, 0, 0, 1}
         };
         pontos = Utils.Multiplica(pontos, RotY);
+
     }
 
     private void aplicarEscala() {
-        int[][] scale = {
+        double[][] scale = {
             {Sx, 0, 0, 0},
             {0, Sy, 0, 0},
             {0, 0, Sz, 0},
@@ -241,13 +239,13 @@ public class Objeto3D {
         Matrix4 m = new Matrix4(mat);
         Quaternion q = m.getRotation(new Quaternion());
 
-        obj.baseRRx = q.getYaw();
-        obj.baseRRy = q.getRoll();
-        obj.baseRRz = q.getPitch();
+        obj.baseRRz = 0;
+        obj.baseRRy = 0 ;
+        obj.baseRRx = 0;
 
-        obj.oldRRx = obj.baseRRx;
-        obj.oldRRy = obj.baseRRy;
-        obj.oldRRz = obj.baseRRz;
+        obj.oldRRx = 0;
+        obj.oldRRy = 0;
+        obj.oldRRz = 0;
 
         if (type == ObjType.CUBO)
         {
